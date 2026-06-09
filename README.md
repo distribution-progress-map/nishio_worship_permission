@@ -1,0 +1,1 @@
+# nishio_worship_permission
