@@ -25,6 +25,23 @@ body{
   height:100%;
 }
 
+.recommend-dot-canvas{
+  mix-blend-mode:multiply;
+}
+
+
+.recommend-toggle{
+  top:0;
+  right:0;
+  padding:6px 8px;
+}
+
+.recommend-toggle button{
+  font-size:12px;
+  padding:5px 8px;
+}
+
+
 .panel{
   position:absolute;
   background:white;
@@ -844,11 +861,208 @@ body{
 /* パソコンのみの設定 */
 
 
+
+/* =========================
+   おすすめエリア ドットレイヤ
+========================= */
+.recommend-panel{
+  top:500px;
+  right:15px;
+  width:170px;
+  font-size:13px;
+  line-height:1.6;
+}
+
+.recommend-title{
+  font-weight:bold;
+  margin-bottom:6px;
+}
+
+.recommend-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:4px;
+}
+
+.recommend-swatch{
+  width:14px;
+  height:14px;
+  border-radius:3px;
+  display:inline-block;
+}
+
+.recommend-swatch.strong{
+  background:#ff9800;
+}
+
+.recommend-swatch.normal{
+  background:#ffe680;
+}
+
+.recommend-panel button{
+  width:100%;
+  margin:6px 0;
+  padding:6px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  background:#f8f8f8;
+}
+
+
+@media (max-width:600px) and (pointer:coarse){
+  .recommend-panel{
+    top:auto;
+    right:6px;
+    bottom:125px;
+    width:155px;
+    font-size:11px;
+    padding:6px;
+  }
+
+}
+
+/* =========================
+   おすすめエリア 地点マーク
+========================= */
+
+.recommend-place-marker{
+  pointer-events:none;
+}
+
+.recommend-pin{
+  width:14px;
+  height:14px;
+  background:#d32f2f;
+  border:2px solid white;
+  border-radius:50%;
+  box-shadow:0 0 4px rgba(0,0,0,.5);
+}
+
+.recommend-label{
+  position:absolute;
+  right:140px;
+  top:-18px;
+  left:auto;
+
+  text-align:left;
+
+  white-space:nowrap;
+
+  background:rgba(255,255,255,.95);
+
+  border:1px solid #d32f2f;
+
+  border-radius:5px;
+
+  padding:4px 8px;
+
+  font-size:12px;
+
+  font-weight:bold;
+
+  line-height:1.4;
+
+  background:rgba(255,235,238,.98);
+}
+
+
+.recommend-area-name-label{
+  pointer-events:none;
+}
+
+.recommend-area-name-box{
+  background:rgba(255,255,255,.88);
+  border:1px solid #ff9800;
+  border-radius:999px;
+  padding:3px 8px;
+  font-size:11px;
+  font-weight:bold;
+  line-height:1.2;
+  white-space:nowrap;
+  color:#333;
+  box-shadow:0 1px 4px rgba(0,0,0,.25);
+  position:relative;
+  z-index:9999;
+}
+
+.recommend-area-name-box.left{
+  transform:translateX(-120px);
+}
+
+.recommend-area-name-box.right{
+  transform:translateX(115px);
+}
+
+.recommend-area-name-box.bottom{
+  transform:translate(0px,60px);
+}
+
+.recommend-hr{
+  border:none;
+  border-top:1px solid #ddd;
+  margin:8px 0;
+}
+
+.recommend-list{
+  font-size:12px;
+  line-height:1.6;
+}
+
+.recommend-list div{
+  white-space:nowrap;
+}
+
+.recommend-total{
+  margin-top:6px;
+  padding-top:5px;
+  border-top:1px solid #eee;
+  font-size:12px;
+  font-weight:bold;
+}
+
+
 </style>
 </head>
 
 <body>
 <div id="map"></div>
+
+<div class="panel recommend-panel" id="recommendPanel">
+  <div class="recommend-title">おすすめエリア</div>
+
+  <button id="recommendToggleBtn" onclick="toggleRecommendLayer()">
+    表示中
+  </button>
+
+  <div class="recommend-row">
+    <span class="recommend-swatch strong"></span>
+    特におすすめ
+  </div>
+
+  <div class="recommend-row">
+    <span class="recommend-swatch normal"></span>
+    おすすめ目安
+  </div>
+
+  <hr class="recommend-hr">
+
+  <div class="recommend-list">
+  <div>西尾駅周辺　　　約8,000世帯</div>
+  <div>桜町前・米津　　約4,000世帯</div>
+  <div>寺津・平坂　　　約6,000世帯</div>
+  <div>一色中心部　　　約5,000世帯</div>
+  <div>吉良吉田周辺　　約4,000世帯</div>
+  <div>福地方面　　　　約3,000世帯</div>
+  <div>幡豆方面　　　　約3,000世帯</div>
+  
+</div>
+
+<div class="recommend-total">
+  ※世帯数は概算です
+</div>
+</div>
+
 
 <div id="confirmOverlay" class="confirm-overlay" style="display:none;">
 
@@ -1155,6 +1369,437 @@ const IS_PARENT_PAGE = !CURRENT_CITY;
 const isTouchDevice = window.matchMedia("(max-width:600px) and (pointer:coarse)").matches;
 const map = L.map("map", { zoomControl:false }).setView([34.86,137.06], 11);
 
+// おすすめドット専用の描画面。市境界より上、配布エリアより下に置く
+map.createPane("recommendPane");
+map.getPane("recommendPane").style.zIndex = 430;
+map.getPane("recommendPane").style.pointerEvents = "none";
+
+map.createPane("drawAreaPane");
+map.getPane("drawAreaPane").style.zIndex = 450;
+
+
+/* =========================
+   おすすめエリア ドットレイヤ
+========================= */
+
+let recommendLayer = null;
+let recommendVisible = true;
+let nishioGeojsonForRecommend = null;
+
+/*
+  西尾市内のおすすめ目安。
+  lat,lng：中心位置
+  radiusKm：広がり
+  power：濃さ
+  level："strong" が濃いオレンジ、"normal" が薄い黄色
+*/
+const RECOMMEND_AREAS = [
+
+{
+  name:"西尾駅周辺",
+  lat:34.8635,
+  lng:137.0615,
+  radiusKm:2.4,
+  power:1.0,
+  level:"strong",
+
+  households:"約8,000～12,000世帯",
+  ratio:"25%",
+  flyers:"約1,250枚",
+  position:"right"
+},
+
+{
+  name:"寺津・平坂方面",
+  lat:34.8465,
+  lng:137.0205,
+  radiusKm:2.2,
+  power:0.75,
+  
+  level:"strong",
+
+  households:"約6,000～9,000世帯",
+  ratio:"20%",
+  flyers:"約1,000枚",
+  position:"left"
+},
+
+{
+  name:"一色中心部",
+  lat:34.8115,
+  lng:137.0175,
+  radiusKm:2.2,
+  power:0.8,
+  level:"strong",
+
+  households:"約5,000～7,000世帯",
+  ratio:"15%",
+  flyers:"約750枚",
+  position:"left"
+},
+
+{
+  name:"桜町前・米津方面",
+  lat:34.8835,
+  lng:137.0650,
+  radiusKm:2.0,
+  power:0.85,
+  level:"strong",
+
+  households:"約4,000～6,000世帯",
+  ratio:"12%",
+  flyers:"約600枚",
+  position:"right"
+},
+
+{
+  name:"吉良吉田周辺",
+  lat:34.7945,
+  lng:137.0710,
+  radiusKm:2.0,
+  power:0.75,
+  level:"strong",
+
+  households:"約4,000～6,000世帯",
+  ratio:"12%",
+  flyers:"約600枚",
+  position:"bottom"
+},
+
+{
+  name:"幡豆方面",
+  lat:34.7930,
+  lng:137.1250,
+  radiusKm:2.4,
+  power:0.65,
+  level:"normal",
+
+  households:"約3,000～5,000世帯",
+  ratio:"8%",
+  flyers:"約400枚",
+  position:"bottom"
+},
+
+{
+  name:"福地方面",
+  lat:34.8350,
+  lng:137.0550,
+  radiusKm:2.0,
+  power:0.6,
+  level:"normal",
+
+  households:"約3,000～5,000世帯",
+  ratio:"8%",
+  flyers:"約400枚",
+  position:"right"
+}
+
+];
+
+
+let recommendInfoLayer = null;
+
+map.createPane("recommendLabelPane");
+map.getPane("recommendLabelPane").style.zIndex = 440;
+
+function createRecommendLabels(){
+
+  recommendInfoLayer = L.layerGroup([], {
+    pane:"recommendLabelPane"
+  });
+
+  RECOMMEND_AREAS.forEach(area => {
+
+    const marker = L.marker(
+      [area.lat, area.lng],
+      {
+        pane:"recommendLabelPane",
+        interactive:false,
+        icon:L.divIcon({
+          className:"recommend-area-name-label",
+          html:`
+            <div class="recommend-area-name-box ${area.position || ''}">
+              ${area.name}
+            </div>
+          `,
+          iconSize:[120,28],
+          iconAnchor:[60,14]
+        })
+      }
+    );
+
+    recommendInfoLayer.addLayer(marker);
+
+  });
+
+  recommendInfoLayer.addTo(map);
+}
+
+
+function toggleRecommendLayer(){
+  recommendVisible = !recommendVisible;
+
+  const btn = document.getElementById("recommendToggleBtn");
+  if (btn) btn.textContent = recommendVisible ? "表示中" : "非表示";
+
+  if (!recommendLayer) return;
+
+  if (recommendVisible) {
+    recommendLayer.addTo(map);
+  } else {
+    map.removeLayer(recommendLayer);
+  }
+
+  if(recommendInfoLayer){
+
+  if(recommendVisible){
+      recommendInfoLayer.addTo(map);
+    }else{
+      map.removeLayer(recommendInfoLayer);
+    }
+
+  }
+
+}
+
+function createRecommendLayer(geojson){
+  nishioGeojsonForRecommend = geojson;
+
+  if (recommendLayer) {
+    map.removeLayer(recommendLayer);
+  }
+
+  recommendLayer = new RecommendDotLayer();
+
+  if (recommendVisible) {
+    recommendLayer.addTo(map);
+  }
+}
+
+/* Leaflet用カスタムCanvasレイヤ */
+const RecommendDotLayer = L.Layer.extend({
+  onAdd:function(map){
+    this._map = map;
+    this._canvas = L.DomUtil.create("canvas", "recommend-dot-canvas");
+
+    const size = map.getSize();
+    this._canvas.width = size.x;
+    this._canvas.height = size.y;
+
+    this._canvas.style.position = "absolute";
+    this._canvas.style.pointerEvents = "none";
+    this._canvas.style.zIndex = 430;
+
+    const pane = map.getPane("recommendPane");
+    pane.appendChild(this._canvas);
+
+    map.on("moveend zoomend resize", this._reset, this);
+    this._reset();
+  },
+
+  onRemove:function(map){
+    if (this._canvas && this._canvas.parentNode) {
+      this._canvas.parentNode.removeChild(this._canvas);
+    }
+
+    map.off("moveend zoomend resize", this._reset, this);
+  },
+
+  _reset:function(){
+    const map = this._map;
+    const canvas = this._canvas;
+    const size = map.getSize();
+    const topLeft = map.containerPointToLayerPoint([0,0]);
+
+    L.DomUtil.setPosition(canvas, topLeft);
+
+    canvas.width = size.x;
+    canvas.height = size.y;
+
+    this._draw();
+  },
+
+  _draw:function(){
+    if (!nishioGeojsonForRecommend) return;
+
+    const map = this._map;
+    const canvas = this._canvas;
+    const ctx = canvas.getContext("2d");
+    const size = map.getSize();
+
+    ctx.clearRect(0,0,size.x,size.y);
+
+    const zoom = map.getZoom();
+
+    // ドットの荒さ。数字を小さくすると細かくなる
+    const spacing = zoom >= 14 ? 13 : zoom >= 13 ? 11 : 9;
+
+    // ドットサイズ
+    const dotSize = zoom >= 14 ? 5.2 : zoom >= 13 ? 4.8 : 4.2;
+    
+
+    for (let x = 0; x < size.x; x += spacing) {
+      for (let y = 0; y < size.y; y += spacing) {
+
+        const latlng = map.containerPointToLatLng([x,y]);
+
+        // 西尾市の外には描かない
+        if (!pointInGeoJSON(latlng.lng, latlng.lat, nishioGeojsonForRecommend)) continue;
+
+        const score = getRecommendScore(latlng.lat, latlng.lng);
+
+        if (score.value <= 0.12) continue;
+
+        ctx.globalAlpha = Math.min(1, score.value * 2.8);
+
+        if (score.level === "strong") {
+          ctx.fillStyle = "#f57c00";
+        } else {
+          ctx.fillStyle = "#ffca28";
+        }
+
+        ctx.fillRect(
+          x - dotSize / 2,
+          y - dotSize / 2,
+          dotSize,
+          dotSize
+        );
+      }
+    }
+
+    ctx.globalAlpha = 1;
+  }
+});
+
+/* おすすめ度を計算 */
+function getRecommendScore(lat, lng){
+  let best = {
+    value:0,
+    level:"normal"
+  };
+
+  RECOMMEND_AREAS.forEach(area => {
+    const d = distanceKm(lat, lng, area.lat, area.lng);
+    const ratio = Math.max(0, 1 - d / area.radiusKm);
+    const value = ratio * area.power;
+
+    if (value > best.value) {
+      best.value = value;
+      best.level = area.level;
+    }
+  });
+
+  return best;
+}
+
+/* 距離計算 */
+function distanceKm(lat1, lng1, lat2, lng2){
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function toRad(v){
+  return v * Math.PI / 180;
+}
+
+/* GeoJSON内判定 */
+function pointInGeoJSON(lng, lat, geojson){
+  return geojson.features.some(feature => {
+    return pointInGeometry(lng, lat, feature.geometry);
+  });
+}
+
+function pointInGeometry(lng, lat, geometry){
+  if (!geometry) return false;
+
+  if (geometry.type === "Polygon") {
+    return pointInPolygon(lng, lat, geometry.coordinates);
+  }
+
+  if (geometry.type === "MultiPolygon") {
+    return geometry.coordinates.some(poly => pointInPolygon(lng, lat, poly));
+  }
+
+  return false;
+}
+
+function pointInPolygon(lng, lat, rings){
+  if (!rings || !rings.length) return false;
+
+  const insideOuter = pointInRing(lng, lat, rings[0]);
+  if (!insideOuter) return false;
+
+  // 穴がある場合は除外
+  for (let i = 1; i < rings.length; i++) {
+    if (pointInRing(lng, lat, rings[i])) return false;
+  }
+
+  return true;
+}
+
+function pointInRing(lng, lat, ring){
+  let inside = false;
+
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const xi = ring[i][0], yi = ring[i][1];
+    const xj = ring[j][0], yj = ring[j][1];
+
+    const intersect =
+      ((yi > lat) !== (yj > lat)) &&
+      (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
+
+    if (intersect) inside = !inside;
+  }
+
+  return inside;
+}
+
+/* =========================
+   おすすめエリア内の地点マーク
+========================= */
+
+let recommendMarkerLayer = null;
+
+function createRecommendMarkers(){
+  recommendMarkerLayer = L.layerGroup([], {
+    pane:"recommendLabelPane"
+  });
+
+  const yahagiMarker = L.marker([34.87776, 137.0229], {
+    pane:"recommendLabelPane",
+    interactive: false,
+    icon: L.divIcon({
+      className: "recommend-place-marker",
+      html: `
+        <div class="recommend-pin"></div>
+        <div class="recommend-label">
+          矢作川西尾緑地<br>
+          <span class="recommend-sub">
+            （集団礼拝の現場）
+          </span>
+        </div>
+      `,
+      iconSize: [130, 34],
+      iconAnchor: [12, 30]
+    })
+  });
+
+  recommendMarkerLayer.addLayer(yahagiMarker);
+  recommendMarkerLayer.addTo(map);
+}
+
+
+
+
+
 L.control.zoom({ position:"bottomleft" }).addTo(map);
 
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -1254,6 +1899,11 @@ fetch("nishio.geojson")
       features:filteredFeatures
     };
 
+    // おすすめドットは西尾市境界の内側だけに描画する
+    createRecommendLayer(filteredGeoJson);
+    createRecommendMarkers();
+    createRecommendLabels();
+
     const boundary = L.geoJSON(filteredGeoJson, {
 
       style:{
@@ -1335,12 +1985,16 @@ fetch(
 // =========================
 function drawLayer(item){
   const layer = L.geoJSON(item.geo, {
+    pane:"drawAreaPane",
     style:{
       color:getColor(item.row["種類"]),
       fillColor:getColor(item.row["種類"]),
       fillOpacity:item.row["種類"] === "配布済" ? 0.5 : 0.35
     }
   }).addTo(drawnItems);
+
+  // おすすめドットより配布予定・配布済エリアを前面に出す
+  if (layer.bringToFront) layer.bringToFront();
 
   const id = item.row["ID"];
   const isPlanned = item.row["種類"] === "配布予定";
@@ -1401,6 +2055,7 @@ function saveNewArea(geo, layer, formData){
     });
 
     drawnItems.addLayer(layer);
+    if (layer.bringToFront) layer.bringToFront();
 
     const newRow = {
       "ID":result.id,
