@@ -438,6 +438,15 @@ body{
     display:none !important;
   }
 
+  .recommend-panel{
+    top:auto;
+    right:6px;
+    bottom:125px;
+    width:155px;
+    font-size:11px;
+    padding:6px;
+  }
+
   .mobile-draw-start{
     display:block;
     position:absolute;
@@ -703,9 +712,9 @@ body{
     padding:4px 2px !important;
   }
 
-.id-search-panel input{
-  font-size:12px !important;
-}
+  .id-search-panel input{
+    font-size:12px !important;
+  }
 
   .modal-bg{
     align-items:flex-start;
@@ -761,6 +770,84 @@ body{
   .leaflet-popup-content{
     font-family: Arial, "Helvetica Neue", sans-serif;
   }
+
+
+
+ /* おすすめエリアを少し小さく */
+  .recommend-panel{
+    left:6px;
+    right:auto;
+    bottom:245px;
+    width:185px;
+    font-size:11px;
+    padding:7px;
+    line-height:1.4;
+  }
+
+  .recommend-panel button{
+    padding:5px;
+    margin:5px 0;
+    font-size:13px !important;
+  }
+
+  .recommend-list{
+    font-size:10px;
+    line-height:1.45;
+  }
+
+  .recommend-total{
+    font-size:10px;
+  }
+
+  /* 凡例をおすすめエリアの下へ */
+  .legend-panel{
+    left:6px;
+    right:auto;
+    bottom:120px;
+    width:150px;
+    font-size:11px;
+    padding:7px;
+  }
+
+  /* 全体表示ボタンをさらに下へ */
+  .reset-panel{
+    left:6px;
+    bottom:65px;
+    padding:4px 6px;
+  }
+
+  .reset-panel button{
+    font-size:12px !important;
+    padding:5px 8px;
+  }
+
+  /* ＋－ボタン */
+  .leaflet-bottom.leaflet-left{
+    bottom:18px;
+    left:6px;
+  }
+
+  .leaflet-bottom.leaflet-left .leaflet-control-zoom{
+    margin-left:0;
+    margin-bottom:0;
+  }
+
+  /* 管理者修正履歴は右下寄せ */
+  .admin-history-panel{
+    right:6px;
+    bottom:110px !important;
+    width:150px;
+    height:70px !important;
+  }
+
+  /* ID検索は右下 */
+  .id-search-panel{
+    right:6px;
+    bottom:12px;
+    width:150px;
+  }
+
+
 
 }
 
@@ -926,17 +1013,7 @@ body{
 }
 
 
-@media (max-width:600px) and (pointer:coarse){
-  .recommend-panel{
-    top:auto;
-    right:6px;
-    bottom:125px;
-    width:155px;
-    font-size:11px;
-    padding:6px;
-  }
 
-}
 
 /* =========================
    おすすめエリア 地点マーク
