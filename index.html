@@ -561,8 +561,8 @@ body{
 
   .reset-panel{
     left:6px;
-    bottom:80px;
-    padding:3px 4px;
+    bottom:10px;
+    padding:4px 6px;
   }
 
   .parent-link-panel{
@@ -582,7 +582,7 @@ body{
   }
 
   .leaflet-bottom.leaflet-left{
-    bottom:130px;
+    bottom:75px;
     left:6px;
   }
 
@@ -809,23 +809,14 @@ body{
     padding:7px;
   }
 
-  /* 全体表示ボタンをさらに下へ */
-  .reset-panel{
-    left:6px;
-    bottom:65px;
-    padding:4px 6px;
-  }
+ 
 
   .reset-panel button{
     font-size:12px !important;
     padding:5px 8px;
   }
 
-  /* ＋－ボタン */
-  .leaflet-bottom.leaflet-left{
-    bottom:18px;
-    left:6px;
-  }
+  
 
   .leaflet-bottom.leaflet-left .leaflet-control-zoom{
     margin-left:0;
@@ -847,7 +838,11 @@ body{
     width:150px;
   }
 
-
+  /* スマホのみ：＋－ボタンを70%に縮小 */
+  .leaflet-control-zoom{
+    transform:scale(0.7);
+    transform-origin:bottom left;
+  }
 
 }
 
