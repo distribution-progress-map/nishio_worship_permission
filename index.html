@@ -403,8 +403,12 @@ body{
 ========================================= */
 
 .legend-panel{
-  right:15px;
-  bottom:20px;   /* PC：右下 */
+  left:10px;
+  top:510px;
+
+  right:auto;
+  bottom:auto;
+
   font-size:13px;
   line-height:1.6;
   padding:8px 10px;
@@ -569,7 +573,7 @@ body{
   }
 
   .leaflet-bottom.leaflet-left{
-    bottom:145px;
+    bottom:130px;
     left:6px;
   }
 
@@ -778,8 +782,8 @@ body{
   }
 
   .leaflet-top.leaflet-left .leaflet-draw{
-    margin-top:95px;   /* 修正履歴 top:100px とほぼ上揃え */
-    margin-left:10px;
+    margin-top:100px;   /* 修正履歴 top:100px とほぼ上揃え */
+    margin-left:20px;
   }
 
   .admin-history-panel{
@@ -828,13 +832,13 @@ body{
 
     content:"✎　エリアを作図";
 
-    font-size:15px;   /* 26px → 約50% */
+    font-size:17px;   /* 26px → 約50% */
     font-weight:bold;
     color:white;
 
     background:linear-gradient(#ff9f1a, #f58200);
 
-    padding:12px 14px;   /* 18×42 → 約50% */
+    padding:13px 13px;   /* 18×42 → 約50% */
 
     border-radius:6px;
 
@@ -853,7 +857,7 @@ body{
   }
 
   .leaflet-bottom.leaflet-left{
-    bottom:100px;   /* 上へ移動（数値を増やすほど上） */
+    bottom:50px;   /* 上へ移動（数値を増やすほど上） */
     left:10px;     /* 右へ移動（数値を増やすほど右） */
   }
 
@@ -866,8 +870,11 @@ body{
    おすすめエリア ドットレイヤ
 ========================= */
 .recommend-panel{
-  top:500px;
-  right:15px;
+  top:180px;
+  left:10px;
+
+  right:auto;
+
   width:170px;
   font-size:13px;
   line-height:1.6;
@@ -904,9 +911,18 @@ body{
   width:100%;
   margin:6px 0;
   padding:6px;
+
   border-radius:6px;
-  border:1px solid #ccc;
-  background:#f8f8f8;
+
+  border:1px solid #b5b5b5;
+
+  background:linear-gradient(#fafafa,#e9e9e9);
+
+  color:#333;
+
+  font-weight:bold;
+
+  box-shadow:0 1px 3px rgba(0,0,0,.15);
 }
 
 
@@ -1042,7 +1058,7 @@ body{
 
   <div class="recommend-row">
     <span class="recommend-swatch normal"></span>
-    おすすめ目安
+    おすすめ
   </div>
 
   <hr class="recommend-hr">
