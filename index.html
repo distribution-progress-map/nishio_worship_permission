@@ -879,8 +879,8 @@ body{
 
   /* スマホ：おすすめボックスを低く・横開きでも左幅固定 */
 .recommend-panel{
-  width:185px;
-  max-width:185px;
+  width:150px;
+  max-width:150px;
   height:auto;
   padding:6px 7px;
   overflow:visible;
@@ -888,14 +888,14 @@ body{
 
 /* 展開しても左ボックス自体は横に伸ばさない */
 .recommend-panel.expanded{
-  width:185px;
-  max-width:185px;
+  width:150px;
+  max-width:150px;
 }
 
 /* タイトルと（タップで開閉）を1行にする */
 .recommend-title{
   white-space:nowrap;
-  margin-bottom:4px;
+  margin-bottom:3px;
 }
 
 .recommend-toggle-hint{
@@ -1222,7 +1222,7 @@ body{
  
   <div class="recommend-title" onclick="toggleRecommendDetail()">
     おすすめエリア
-    <span class="recommend-toggle-hint">（タップで開閉）</span>
+    <span class="recommend-toggle-hint">（タップで開閉→）</span>
   </div>
 
   <button id="recommendToggleBtn" onclick="toggleRecommendLayer()">
