@@ -877,6 +877,73 @@ body{
     transform-origin:bottom left;
   }
 
+  /* スマホ：おすすめボックスを低く・横開きでも左幅固定 */
+.recommend-panel{
+  width:185px;
+  max-width:185px;
+  height:auto;
+  padding:6px 7px;
+  overflow:visible;
+}
+
+/* 展開しても左ボックス自体は横に伸ばさない */
+.recommend-panel.expanded{
+  width:185px;
+  max-width:185px;
+}
+
+/* タイトルと（タップで開閉）を1行にする */
+.recommend-title{
+  white-space:nowrap;
+  margin-bottom:4px;
+}
+
+.recommend-toggle-hint{
+  display:inline;
+  margin-left:4px;
+  margin-top:0;
+  font-size:10px;
+}
+
+/* ボタンを低くする */
+.recommend-panel button{
+  padding:4px 5px;
+  margin:4px 0;
+  font-size:12px !important;
+  line-height:1.2;
+}
+
+/* 色説明の行間も少し詰める */
+.recommend-row{
+  margin-top:2px;
+  gap:5px;
+}
+
+/* 右側の展開ボックス */
+.recommend-panel.expanded .recommend-detail{
+  display:block;
+  position:absolute;
+  left:198px;
+  top:0;
+
+  width:220px;
+  background:white;
+  padding:7px;
+  border-radius:8px;
+  box-shadow:0 0 6px rgba(0,0,0,.3);
+}
+
+/* 右側ボックスの横線を消す */
+.recommend-panel.expanded .recommend-hr{
+  display:none;
+}
+
+.recommend-panel.expanded .recommend-total{
+  border-top:none;
+  margin-top:4px;
+  padding-top:2px;
+}
+
 }
 
 
