@@ -505,7 +505,7 @@ body{
     width:150px;
 
     background:white;
-    padding:6px 12px;
+    padding:6px 14px;
     border-radius:8px;
     box-shadow:0 0 6px rgba(0,0,0,.3);
   }
@@ -2136,6 +2136,11 @@ fetch("nishio.geojson")
     map.fitBounds(boundary.getBounds(), {
       padding:[40, 40]
     });
+
+    /* スマホだけ初期位置を少し下へ */
+    if(window.matchMedia("(max-width:600px) and (pointer:coarse)").matches){
+      map.panBy([0,-80]);
+    }
 
     window.fullBounds = boundary.getBounds();
 
