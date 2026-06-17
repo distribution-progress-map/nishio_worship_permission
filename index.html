@@ -439,22 +439,24 @@ body{
   }
 
 
-  /* スマホ：おすすめボックスを横開きにする */
+  /* スマホ：おすすめボックスを横開きにする・横開きでも左幅固定 */
   .recommend-panel{
     left:5px;
     right:auto;
     top:120px;
     bottom:auto;
+    height:auto;
 
-    width:120px;
+    width:170px;
     max-width:170px;
 
-    padding:7px;
+    padding:6px 7px;
     font-size:11px;
     line-height:1.4;
 
     overflow:visible;
   }
+   
 
   .recommend-title{
     cursor:pointer;
@@ -871,15 +873,7 @@ body{
     transform-origin:bottom left;
   }
 
-  /* スマホ：おすすめボックスを低く・横開きでも左幅固定 */
-.recommend-panel{
-  width:170px;
-  max-width:170px;
-  height:auto;
-  padding:6px 7px;
-  overflow:visible;
-}
-
+ 
 /* 展開しても左ボックス自体は横に伸ばさない */
 .recommend-panel.expanded{
   width:170px;
