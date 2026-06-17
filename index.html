@@ -476,17 +476,19 @@ body{
     max-width:calc(100vw - 12px);
   }
 
+
+    /* 右側の展開ボックス */
   .recommend-panel.expanded .recommend-detail{
     display:block;
-
     position:absolute;
-    left:178px;
-    top:0;
 
-    width:210px;
+    left:190px;
+    top:-35px;
+
+    width:150px;
 
     background:white;
-    padding:7px;
+    padding:6px;
     border-radius:8px;
     box-shadow:0 0 6px rgba(0,0,0,.3);
   }
@@ -502,7 +504,7 @@ body{
 
   .recommend-panel.expanded .recommend-total{
     font-size:10px;
-    }
+  }
 
   .mobile-draw-start{
     display:block;
@@ -908,21 +910,7 @@ body{
   gap:5px;
 }
 
-/* 右側の展開ボックス */
-.recommend-panel.expanded .recommend-detail{
-  display:block;
-  position:absolute;
 
-  left:190px;
-  top:-35px;
-
-  width:150px;
-
-  background:white;
-  padding:6px;
-  border-radius:8px;
-  box-shadow:0 0 6px rgba(0,0,0,.3);
-}
 
 /* 右側ボックスの横線を消す */
 .recommend-panel.expanded .recommend-hr{
