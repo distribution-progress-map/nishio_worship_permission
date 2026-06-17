@@ -386,7 +386,7 @@ body{
 
 .legend-panel{
   left:10px;
-  top:510px;
+  top:490px;
 
   right:auto;
   bottom:auto;
@@ -998,14 +998,22 @@ body{
   }
 
   .leaflet-draw-actions{
-    left:0 !important;
-    top:100% !important;
-    margin-top:20px;
+    left:100% !important;
+    top:40 !important;
+
+    margin-left:20px;
+    margin-top:40;
+
+    white-space:nowrap;
   }
 
   .leaflet-bottom.leaflet-left{
     bottom:50px;   /* 上へ移動（数値を増やすほど上） */
     left:10px;     /* 右へ移動（数値を増やすほど右） */
+  }
+
+  .recommend-toggle-hint{
+    display:none !important;
   }
 
 }
@@ -1163,21 +1171,114 @@ body{
 }
 
 
-.recommend-panel{
+/* =========================
+   作図エリア詳細専用ポップアップ
+========================= */
+.area-detail-popup{
   position:fixed;
-  z-index:700;
+
+  width:min(320px, 76vw);
+  max-height:75vh;
+  overflow-y:auto;
+
+  box-sizing:border-box;
+  padding:18px 16px;
+
+  background:white;
+  border-radius:12px;
+  box-shadow:0 5px 22px rgba(0,0,0,.45);
+
+  z-index:2500;
+
+  font-size:13px;
+  line-height:1.5;
 }
 
-.recommend-panel.expanded .recommend-detail{
-  z-index:701;
+.area-detail-popup::after{
+  content:"";
+  position:absolute;
+
+  left:50%;
+  bottom:-10px;
+
+  transform:translateX(-50%);
+
+  border-left:10px solid transparent;
+  border-right:10px solid transparent;
+  border-top:10px solid white;
 }
 
-.leaflet-popup-pane{
-  z-index:3000 !important;
+
+.area-detail-drag-handle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  margin:-18px -16px 10px;
+  padding:8px 8px 8px 12px;
+
+  background:#f3f3f3;
+  border-radius:12px 12px 0 0;
+
+  font-weight:bold;
+
+  cursor:move;
+  user-select:none;
+  touch-action:none;
 }
 
-.leaflet-popup{
-  z-index:2001 !important;
+.area-detail-close{
+  position:static;
+
+  width:28px;
+  height:28px;
+
+  padding:0;
+
+  border:none;
+  border-radius:50%;
+
+  background:#dddddd;
+  color:#444;
+
+  font-size:20px !important;
+  line-height:28px;
+
+  cursor:pointer;
+}
+
+
+
+
+
+@media (max-width:600px) and (pointer:coarse){
+
+  .area-detail-popup{
+    width:72vw;
+    max-height:72vh;
+
+    padding:16px 14px;
+
+    font-size:12px;
+  }
+
+  .area-detail-drag-handle{
+    margin:-16px -14px 10px;
+  }
+
+}
+
+.area-detail-popup.popup-below::after{
+  top:-10px;
+  bottom:auto;
+
+  border-top:none;
+  border-bottom:10px solid white;
+}
+
+
+.area-detail-popup.manually-moved::after{
+  display:none;
 }
 
 </style>
@@ -1185,6 +1286,30 @@ body{
 
 <body>
 <div id="map"></div>
+
+
+<!-- 作図エリア詳細専用ポップアップ -->
+<div id="areaDetailPopup" class="area-detail-popup" style="display:none;">
+
+  <div
+    id="areaDetailDragHandle"
+    class="area-detail-drag-handle">
+
+    <span>エリア詳細（つかんで移動⇔）</span>
+
+    <button
+      type="button"
+      class="area-detail-close"
+      onclick="closeAreaDetailPopup()">
+      ×
+    </button>
+
+  </div>
+
+  <div id="areaDetailPopupContent"></div>
+
+</div>
+
 
 <div class="panel recommend-panel" id="recommendPanel">
  
@@ -1538,6 +1663,12 @@ const IS_PARENT_PAGE = !CURRENT_CITY;
 
 const isTouchDevice = window.matchMedia("(max-width:600px) and (pointer:coarse)").matches;
 const map = L.map("map", { zoomControl:false }).setView([34.86,137.06], 11);
+
+
+
+
+
+
 
 // おすすめドット専用の描画面。市境界より上、配布エリアより下に置く
 map.createPane("recommendPane");
@@ -2188,15 +2319,40 @@ function drawLayer(item){
     plannedItemsById[id] = item;
   }
 
+  
   if(!IS_PARENT_PAGE){
-    layer.bindPopup(makePopupHtml(item.row, isPlanned));
 
-    layer.on("click", function(){
-      map.fitBounds(layer.getBounds(), {
-        padding:[40, 40],
-      });
+  layer.on("click", function(e){
+
+    L.DomEvent.stopPropagation(e);
+
+    // 先にエリアを画面内へ表示
+    map.fitBounds(layer.getBounds(), {
+      padding:[40, 40],
+      animate:false
     });
-  }
+
+    // エリア上端の中央位置
+    const bounds = layer.getBounds();
+
+    const popupLatLng = L.latLng(
+      bounds.getNorth(),
+      (
+        bounds.getEast() +
+        bounds.getWest()
+      ) / 2
+    );
+
+    showAreaDetailPopup(
+      item.row,
+      isPlanned,
+      popupLatLng
+    );
+
+  });
+
+}
+
 }
 
 map.on("draw:created", async function(e){
@@ -2259,14 +2415,52 @@ function saveNewArea(geo, layer, formData){
       plannedItemsById[newRow["ID"]] = item;
     }
 
-    layer.bindPopup(makePopupHtml(newRow, isPlanned));
-    layer.on("click", function(){
-      map.fitBounds(layer.getBounds(), {
-        padding:[40, 40],
-      });
-    });
+    
+    layer.on("click", function(e){
 
-    openPopupAbove(layer);
+      L.DomEvent.stopPropagation(e);
+
+  map.fitBounds(layer.getBounds(), {
+    padding:[40, 40],
+    animate:false
+  });
+
+  const bounds = layer.getBounds();
+
+  const popupLatLng = L.latLng(
+    bounds.getNorth(),
+    (
+      bounds.getEast() +
+      bounds.getWest()
+    ) / 2
+  );
+
+  showAreaDetailPopup(
+    newRow,
+    isPlanned,
+    popupLatLng
+  );
+
+});
+
+
+const newBounds = layer.getBounds();
+
+const newPopupLatLng = L.latLng(
+  newBounds.getNorth(),
+  (
+    newBounds.getEast() +
+    newBounds.getWest()
+  ) / 2
+);
+
+showAreaDetailPopup(
+  newRow,
+  isPlanned,
+  newPopupLatLng
+);
+
+
   });
 }
 
@@ -2416,6 +2610,229 @@ function openPopupAbove(layer){
   layer.openPopup(topCenter);
 }
 
+
+function showAreaDetailPopup(row, isPlanned, latlng){
+
+  const popup =
+    document.getElementById("areaDetailPopup");
+
+  popup.classList.remove("manually-moved");
+
+  const content =
+    document.getElementById("areaDetailPopupContent");
+
+  content.innerHTML =
+    makePopupHtml(row, isPlanned);
+
+  popup.style.display = "block";
+
+  // 地図上の緯度経度を画面上の位置に変換
+  const mapPoint =
+    map.latLngToContainerPoint(latlng);
+
+  const mapRect =
+    map.getContainer().getBoundingClientRect();
+
+  const popupWidth =
+    popup.offsetWidth;
+
+  const popupHeight =
+    popup.offsetHeight;
+
+  // 作図エリアの上に表示
+  let left =
+    mapRect.left +
+    mapPoint.x -
+    popupWidth / 2;
+
+  let top =
+    mapRect.top +
+    mapPoint.y -
+    popupHeight -
+    18;
+
+  // 画面の左右にはみ出さないようにする
+  const sideMargin = 8;
+
+  left = Math.max(
+    sideMargin,
+    Math.min(
+      left,
+      window.innerWidth -
+      popupWidth -
+      sideMargin
+    )
+  );
+
+  // 上にはみ出す場合は、作図エリアの下に表示
+  if(top < sideMargin){
+
+    top =
+      mapRect.top +
+      mapPoint.y +
+      18;
+
+    popup.classList.add("popup-below");
+
+  }else{
+
+    popup.classList.remove("popup-below");
+
+  }
+
+  // 下にもはみ出さないようにする
+  top = Math.min(
+    top,
+    window.innerHeight -
+    popupHeight -
+    sideMargin
+  );
+
+  popup.style.left = left + "px";
+  popup.style.top = top + "px";
+}
+
+
+function closeAreaDetailPopup(){
+
+  document.getElementById(
+    "areaDetailPopup"
+  ).style.display = "none";
+
+}
+
+map.on("click", function(){
+  closeAreaDetailPopup();
+});
+
+
+let areaPopupDragging = false;
+let areaPopupOffsetX = 0;
+let areaPopupOffsetY = 0;
+
+const areaDetailPopup =
+  document.getElementById("areaDetailPopup");
+
+const areaDetailDragHandle =
+  document.getElementById("areaDetailDragHandle");
+
+
+areaDetailDragHandle.addEventListener(
+  "pointerdown",
+  function(e){
+
+    // 閉じるボタンを押したときはドラッグしない
+    if(e.target.closest(".area-detail-close")){
+      return;
+    }
+
+    areaPopupDragging = true;
+
+    const rect =
+      areaDetailPopup.getBoundingClientRect();
+
+    areaPopupOffsetX =
+      e.clientX - rect.left;
+
+    areaPopupOffsetY =
+      e.clientY - rect.top;
+
+    areaDetailDragHandle.setPointerCapture(
+      e.pointerId
+    );
+
+    e.preventDefault();
+  }
+);
+
+
+areaDetailDragHandle.addEventListener(
+  "pointermove",
+  function(e){
+
+    if(!areaPopupDragging){
+      return;
+    }
+
+    const popupWidth =
+      areaDetailPopup.offsetWidth;
+
+    const popupHeight =
+      areaDetailPopup.offsetHeight;
+
+    let left =
+      e.clientX - areaPopupOffsetX;
+
+    let top =
+      e.clientY - areaPopupOffsetY;
+
+    const margin = 8;
+
+    left = Math.max(
+      margin,
+      Math.min(
+        left,
+        window.innerWidth -
+        popupWidth -
+        margin
+      )
+    );
+
+    top = Math.max(
+      margin,
+      Math.min(
+        top,
+        window.innerHeight -
+        popupHeight -
+        margin
+      )
+    );
+
+    areaDetailPopup.style.left =
+      left + "px";
+
+    areaDetailPopup.style.top =
+      top + "px";
+
+    // 手動移動後は三角形を消す
+    areaDetailPopup.classList.add(
+      "manually-moved"
+    );
+  }
+);
+
+
+function stopAreaPopupDrag(e){
+
+  if(!areaPopupDragging){
+    return;
+  }
+
+  areaPopupDragging = false;
+
+  try{
+    areaDetailDragHandle.releasePointerCapture(
+      e.pointerId
+    );
+  }catch(error){
+    // PointerCaptureが解除済みの場合は何もしない
+  }
+
+}
+
+
+areaDetailDragHandle.addEventListener(
+  "pointerup",
+  stopAreaPopupDrag
+);
+
+
+areaDetailDragHandle.addEventListener(
+  "pointercancel",
+  stopAreaPopupDrag
+);
+
+
 function makePopupHtml(row, isPlanned){
 
   let html =
@@ -2546,12 +2963,17 @@ async function convertPlannedToDone(id){
     }
 
     const doneLayer = L.geoJSON(item.geo, {
+      pane:"drawAreaPane",
+
       style:{
         color:getColor("配布済"),
         fillColor:getColor("配布済"),
         fillOpacity:0.5
       }
     }).addTo(drawnItems);
+
+// 元の配布予定エリアより前面に出す
+doneLayer.bringToFront();
 
     const doneRow = {
       "ID":id + "（2）",
@@ -2566,14 +2988,51 @@ async function convertPlannedToDone(id){
     areaItemsById[doneRow["ID"]] = doneItem;
     areaLayersById[doneRow["ID"]] = doneLayer;
 
-    doneLayer.bindPopup(makePopupHtml(doneRow, false));
-    doneLayer.on("click", function(){
-      map.fitBounds(doneLayer.getBounds(), {
-        padding:[40, 40],
-      });
-    });
+    
+    doneLayer.on("click", function(e){
 
-    openPopupAbove(doneLayer);
+      L.DomEvent.stopPropagation(e);
+
+  map.fitBounds(doneLayer.getBounds(), {
+    padding:[40, 40],
+    animate:false
+  });
+
+  const bounds = doneLayer.getBounds();
+
+  const popupLatLng = L.latLng(
+    bounds.getNorth(),
+    (
+      bounds.getEast() +
+      bounds.getWest()
+    ) / 2
+  );
+
+  showAreaDetailPopup(
+    doneRow,
+    false,
+    popupLatLng
+  );
+
+});
+
+
+const doneBounds = doneLayer.getBounds();
+
+const donePopupLatLng = L.latLng(
+  doneBounds.getNorth(),
+  (
+    doneBounds.getEast() +
+    doneBounds.getWest()
+  ) / 2
+);
+
+showAreaDetailPopup(
+  doneRow,
+  false,
+  donePopupLatLng
+);
+
   });
 }
 
@@ -3154,6 +3613,14 @@ document.getElementById("confirmCancelButton")
 window.resetView = resetView;
 window.goParentPage = goParentPage;
 window.toggleHistoryPanel = toggleHistoryPanel;
+
+
+document
+  .getElementById("areaDetailPopup")
+  .addEventListener("click", function(e){
+    e.stopPropagation();
+  });
+
 </script>
 </body>
 </html>
