@@ -1913,7 +1913,13 @@ function toggleRecommendLayer(){
 
   if(recommendVisible){
 
-    map.addLayer(recommendLayer);
+    if(recommendLayer){
+      map.addLayer(recommendLayer);
+    }
+
+    if(recommendInfoLayer){
+      map.addLayer(recommendInfoLayer);
+    }
 
     btn.textContent = "表示中";
 
@@ -1922,7 +1928,13 @@ function toggleRecommendLayer(){
 
   }else{
 
-    map.removeLayer(recommendLayer);
+    if(recommendLayer){
+      map.removeLayer(recommendLayer);
+    }
+
+    if(recommendInfoLayer){
+      map.removeLayer(recommendInfoLayer);
+    }
 
     btn.textContent = "非表示";
 
