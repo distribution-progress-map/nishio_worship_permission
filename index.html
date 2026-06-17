@@ -3638,11 +3638,25 @@ function cancelContactForm(){
 // 検索・表示補助
 // =========================
 function resetView(){
-  if(window.fullBounds){
-    map.fitBounds(window.fullBounds, {
-      padding:[30, 30]
+
+  if(!window.fullBounds) return;
+
+  map.fitBounds(window.fullBounds, {
+    padding:[30, 30],
+    animate:false
+  });
+
+  // スマホだけ初期表示と同じ位置へ下げる
+  if(
+    window.matchMedia(
+      "(max-width:600px) and (pointer:coarse)"
+    ).matches
+  ){
+    map.panBy([0, -5], {
+      animate:false
     });
   }
+
 }
 
 function openConfirm(message, callback){
