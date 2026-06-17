@@ -30,18 +30,6 @@ body{
 }
 
 
-.recommend-toggle{
-  top:0;
-  right:0;
-  padding:6px 8px;
-}
-
-.recommend-toggle button{
-  font-size:12px;
-  padding:5px 8px;
-}
-
-
 .panel{
   position:absolute;
   background:white;
@@ -243,6 +231,11 @@ body{
 .history-title{
   margin-bottom:4px;
   cursor:pointer;
+  font-size:15px;
+  font-weight:bold;
+  background:#f5f7fa;
+  padding:4px 6px;
+  border-radius:5px;
 }
 
 .history-toggle-hint{
@@ -377,17 +370,6 @@ body{
 }
 
 
-/* 「管理者修正履歴」のデザイン */
-.history-title{
-  font-size:15px;
-  font-weight:bold;
-  background:#f5f7fa;
-  padding:4px 6px;
-  border-radius:5px;
-}
-/* 「管理者修正履歴」のデザイン */
-
-
 /* =========================
    スマホ中央ポイント作図UI
 ========================= */
@@ -477,20 +459,9 @@ body{
     cursor:pointer;
   }
 
-  .recommend-toggle-hint{
-    display:block;
-    font-size:9px;
-    color:#888;
-    margin-top:2px;
-  }
 
   .recommend-detail{
     display:none;
-  }
-
-  .recommend-panel.expanded{
-    width:390px;
-    max-width:calc(100vw - 12px);
   }
 
 
@@ -863,7 +834,6 @@ body{
     line-height:1.2;
     width:50%;
     display:block;
-    margin:4px 0;
   }
 
 
@@ -929,7 +899,6 @@ body{
 
 
 }
-
 
 
 /* パソコンのみの設定 */
@@ -1043,7 +1012,6 @@ body{
 /* パソコンのみの設定 */
 
 
-
 /* =========================
    おすすめエリア ドットレイヤ
 ========================= */
@@ -1093,8 +1061,6 @@ body{
 
   box-shadow:0 1px 3px rgba(0,0,0,.15);
 }
-
-
 
 
 /* =========================
@@ -1197,6 +1163,23 @@ body{
 }
 
 
+.recommend-panel{
+  position:fixed;
+  z-index:700;
+}
+
+.recommend-panel.expanded .recommend-detail{
+  z-index:701;
+}
+
+.leaflet-popup-pane{
+  z-index:3000 !important;
+}
+
+.leaflet-popup{
+  z-index:2001 !important;
+}
+
 </style>
 </head>
 
@@ -1246,7 +1229,6 @@ body{
   </div>
 
 </div>
-
 
 
 </div>
@@ -1994,9 +1976,6 @@ function createRecommendMarkers(){
 }
 
 
-
-
-
 L.control.zoom({ position:"bottomleft" }).addTo(map);
 
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -2018,6 +1997,7 @@ let mobileDrawing = false;
 let mobilePoints = [];
 let mobilePreviewLayer = null;
 let ignoreNextClick = false;
+
 
 // =========================
 // Leaflet Draw 日本語化
@@ -2139,7 +2119,7 @@ fetch("nishio.geojson")
 
     /* スマホだけ初期位置を少し下へ */
     if(window.matchMedia("(max-width:600px) and (pointer:coarse)").matches){
-      map.panBy([0,-10]);
+      map.panBy([0,-5]);
     }
 
     window.fullBounds = boundary.getBounds();
