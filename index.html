@@ -2313,16 +2313,9 @@ fetch("nishio.geojson")
 
     }).addTo(map);
 
-    map.fitBounds(boundary.getBounds(), {
-      padding:[40, 40]
-    });
-
-    /* スマホだけ初期位置を少し下へ */
-    if(window.matchMedia("(max-width:600px) and (pointer:coarse)").matches){
-      map.panBy([0,-5]);
-    }
-
     window.fullBounds = boundary.getBounds();
+
+    fitFullBounds();
 
   });
 
@@ -3634,28 +3627,46 @@ function cancelContactForm(){
   document.getElementById("contactFormModal").style.display = "none";
 }
 
+
+function fitFullBounds(){
+
+  if(!window.fullBounds) return;
+
+  const isMobile =
+    window.matchMedia(
+      "(max-width:600px) and (pointer:coarse)"
+    ).matches;
+
+  if(isMobile){
+
+    map.fitBounds(window.fullBounds, {
+
+      // 上側の余白を大きくして、市全体を下へ寄せる
+      paddingTopLeft:[30, 70],
+      paddingBottomRight:[30, 30],
+
+      animate:false
+    });
+
+  }else{
+
+    map.fitBounds(window.fullBounds, {
+      padding:[30, 30],
+      animate:false
+    });
+
+  }
+
+}
+
 // =========================
 // 検索・表示補助
 // =========================
 function resetView(){
 
-  if(!window.fullBounds) return;
+  closeAreaDetailPopup();
 
-  map.fitBounds(window.fullBounds, {
-    padding:[30, 30],
-    animate:false
-  });
-
-  // スマホだけ初期表示と同じ位置へ下げる
-  if(
-    window.matchMedia(
-      "(max-width:600px) and (pointer:coarse)"
-    ).matches
-  ){
-    map.panBy([0, -5], {
-      animate:false
-    });
-  }
+  fitFullBounds();
 
 }
 
