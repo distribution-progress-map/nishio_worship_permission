@@ -1266,6 +1266,70 @@ body{
     margin:-16px -14px 10px;
   }
 
+   /* エリア詳細ボックス全体を小さくする */
+  .area-detail-popup{
+    width:min(260px, 68vw) !important;
+    max-height:68vh;
+
+    padding:10px 10px 12px;
+
+    font-size:11px;
+    line-height:1.35;
+
+    border-radius:9px;
+  }
+
+  /* 上部の「エリア詳細」部分 */
+  .area-detail-drag-handle{
+    margin:-10px -10px 7px;
+    padding:5px 6px 5px 9px;
+
+    border-radius:9px 9px 0 0;
+
+    font-size:12px;
+    line-height:1.2;
+  }
+
+  /* 閉じる×ボタン */
+  .area-detail-close{
+    width:24px;
+    height:24px;
+
+    font-size:17px !important;
+    line-height:24px;
+  }
+
+  /* 詳細本文 */
+  #areaDetailPopupContent{
+    padding-top:0;
+    font-size:11px;
+    line-height:1.35;
+  }
+
+  .area-detail-popup .popup-main-info{
+    font-size:12px;
+    line-height:1.4;
+  }
+
+  /* 詳細ボックス内の下側ボタンを小さくする */
+  .area-detail-popup #areaDetailPopupContent button{
+    width:auto !important;
+    min-width:0 !important;
+
+    padding:3px 6px !important;
+
+    font-size:10px !important;
+    line-height:1.2 !important;
+
+    border-radius:4px;
+  }
+
+  /* 管理者用ID部分も少し小さくする */
+  .area-detail-popup #areaDetailPopupContent div{
+    overflow-wrap:anywhere;
+  }
+
+
 }
 
 .area-detail-popup.popup-below::after{
