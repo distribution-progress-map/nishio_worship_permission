@@ -2139,7 +2139,7 @@ fetch("nishio.geojson")
 
     /* スマホだけ初期位置を少し下へ */
     if(window.matchMedia("(max-width:600px) and (pointer:coarse)").matches){
-      map.panBy([0,-25]);
+      map.panBy([0,-10]);
     }
 
     window.fullBounds = boundary.getBounds();
