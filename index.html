@@ -1272,22 +1272,24 @@ body{
 
   /* 上部の「エリア詳細」部分 */
   .area-detail-drag-handle{
-    margin:-10px -10px 7px;
-    padding:12px 6px 5px 9px;
+    margin:-10px -10px 4px;
+    padding:3px 5px 3px 7px;
+
+    min-height:0;
 
     border-radius:9px 9px 0 0;
 
-    font-size:12px;
-    line-height:1.2;
+    font-size:11px;
+    line-height:1.05;
   }
 
   /* 閉じる×ボタン */
   .area-detail-close{
-    width:24px;
-    height:24px;
+    width:20px;
+    height:20px;
 
-    font-size:17px !important;
-    line-height:24px;
+    font-size:15px !important;
+    line-height:20px;
   }
 
   /* 詳細本文 */
@@ -1320,6 +1322,16 @@ body{
     overflow-wrap:anywhere;
   }
 
+  .popup-request-button-row{
+    margin-top:3px;
+    margin-bottom:0;
+  }
+
+  .popup-id-divider{
+    margin:4px 0 3px !important;
+    border:none;
+    border-top:1px dashed #ccc;
+  }
 
 }
 
@@ -3017,12 +3029,16 @@ function makePopupHtml(row, isPlanned){
   }
 
 
-  html += `<br><br>
-    <button class="popup-admin-btn" onclick="openRequestMenu('${row["ID"]}')">管理者へ修正依頼</button>`;
+  html += `
+  <div class="popup-request-button-row">
+    <button class="popup-admin-btn" onclick="openRequestMenu('${row["ID"]}')">
+      管理者へ修正依頼
+    </button>
+  </div>`;
 
 
   html += `
-    <hr style="margin:10px 0; border:none; border-top:1px dashed #ccc;">
+    <hr class="popup-id-divider">
     <div style="font-size:12px; color:#666;">
       管理者用ID：${row["ID"]}<br>
       <button class="popup-admin-btn"
