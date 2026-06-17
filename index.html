@@ -1177,7 +1177,7 @@ body{
 .area-detail-popup{
   position:fixed;
 
-  width:min(320px, 76vw);
+  width:min(230px, 60vw);
   max-height:75vh;
   overflow-y:auto;
 
@@ -2184,6 +2184,8 @@ const plannedItemsById = {};
 const areaItemsById = {};
 const areaLayersById = {};
 
+let selectedAreaLayer = null;
+
 let currentRequestId = null;
 let confirmCallback = null;
 let areaFormResolver = null;
@@ -2407,6 +2409,12 @@ function drawLayer(item){
       ) / 2
     );
 
+
+    highlightSelectedArea(
+      layer,
+      item.row["種類"]
+    );
+
     showAreaDetailPopup(
       item.row,
       isPlanned,
@@ -2499,6 +2507,12 @@ function saveNewArea(geo, layer, formData){
     ) / 2
   );
 
+
+  highlightSelectedArea(
+    layer,
+    formData.type
+  );
+
   showAreaDetailPopup(
     newRow,
     isPlanned,
@@ -2516,6 +2530,12 @@ const newPopupLatLng = L.latLng(
     newBounds.getEast() +
     newBounds.getWest()
   ) / 2
+);
+
+
+highlightSelectedArea(
+  layer,
+  formData.type
 );
 
 showAreaDetailPopup(
@@ -2675,6 +2695,43 @@ function openPopupAbove(layer){
 }
 
 
+function highlightSelectedArea(layer, type){
+
+  // 前に選択していたエリアを元に戻す
+  if(selectedAreaLayer){
+
+    const originalType =
+      selectedAreaLayer._areaType;
+
+    selectedAreaLayer.setStyle({
+      color:getColor(originalType),
+      fillColor:getColor(originalType),
+      weight:3,
+      fillOpacity:
+        originalType === "配布済"
+          ? 0.5
+          : 0.35
+    });
+
+  }
+
+  selectedAreaLayer = layer;
+  selectedAreaLayer._areaType = type;
+
+  // 今選択したエリアだけ強調
+  selectedAreaLayer.setStyle({
+    color:"#ffeb3b",
+    weight:5,
+    fillOpacity:
+      type === "配布済"
+        ? 0.65
+        : 0.5
+  });
+
+  selectedAreaLayer.bringToFront();
+}
+
+
 function showAreaDetailPopup(row, isPlanned, latlng){
 
   const popup =
@@ -2763,11 +2820,41 @@ function closeAreaDetailPopup(){
     "areaDetailPopup"
   ).style.display = "none";
 
+  if(selectedAreaLayer){
+
+    const originalType =
+      selectedAreaLayer._areaType;
+
+    selectedAreaLayer.setStyle({
+      color:getColor(originalType),
+      fillColor:getColor(originalType),
+      weight:3,
+      fillOpacity:
+        originalType === "配布済"
+          ? 0.5
+          : 0.35
+    });
+
+    selectedAreaLayer = null;
+  }
+
 }
+
 
 map.on("click", function(){
   closeAreaDetailPopup();
 });
+
+
+map.dragging.enable();
+
+if(map.touchZoom){
+  map.touchZoom.enable();
+}
+
+if(map.scrollWheelZoom){
+  map.scrollWheelZoom.enable();
+}
 
 
 let areaPopupDragging = false;
@@ -3072,6 +3159,11 @@ doneLayer.bringToFront();
     ) / 2
   );
 
+  highlightSelectedArea(
+    doneLayer,
+    "配布済"
+  );
+
   showAreaDetailPopup(
     doneRow,
     false,
@@ -3089,6 +3181,11 @@ const donePopupLatLng = L.latLng(
     doneBounds.getEast() +
     doneBounds.getWest()
   ) / 2
+);
+
+highlightSelectedArea(
+  doneLayer,
+  "配布済"
 );
 
 showAreaDetailPopup(
