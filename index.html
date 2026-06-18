@@ -1335,9 +1335,9 @@ body{
 
   /* 「タップで開閉」の文字を薄いグレーに */
   .recommend-toggle-hint{
-    color:#999;
-    font-weight:normal;
-    opacity:0.85;
+    color:#777;
+    font-weight:bold;
+    opacity:1;
   }
 
   /* 2色の凡例を横一列に並べる */
@@ -1346,8 +1346,8 @@ body{
     align-items:center;
     width:auto;
     margin-top:2px;
-    margin-right:8px;
-    gap:4px;
+    margin-right:6px;
+    gap:6px;
     white-space:nowrap;
   }
 
@@ -1361,6 +1361,11 @@ body{
     width:11px;
     height:11px;
     flex-shrink:0;
+  }
+
+   /* おすすめの「表示中」ボタンの横幅を縮める */
+  #recommendToggleBtn{
+    width:40% !important;
   }
 
 }
